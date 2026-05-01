@@ -1,9 +1,7 @@
 import { Router } from "express";
-import type { Response, Request } from "express";
+import { SubscriberAuth } from "../controllers/subcriber_controller.ts";
 const router: Router = Router();
-router.post("/register", (req: Request, res: Response) => {
-  res.json({
-    message: "Hello from the sub route",
-  });
-});
+let sub_auth = new SubscriberAuth();
+router.post("/register", sub_auth.Register);
+router.post("/login", sub_auth.Login);
 export default router;
