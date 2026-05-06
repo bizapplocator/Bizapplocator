@@ -3,8 +3,9 @@ import {
   register_schema,
   login_schema,
 } from "../schemas/subscribers.schema.ts";
-
+import prisma from "../lib/prisma.ts";
 import { PasswordController } from "../utils/password_hashing.ts";
+import JwtUtil from "../utils/jwt_gen.ts";
 class SubscriberAuth {
   async Register(req: Request, res: Response): Promise<void> {
     try {
@@ -25,9 +26,26 @@ class SubscriberAuth {
 
       // Save to db
       const hash_password = await pass_functions.hashPassword(password);
-
+      const subscriber = await prisma.accounts.create({
+        data: {
+          name: name,
+          email: email,
+          password: hash_password,
+          role: "subscriber",
+        },
+      });
+      let jwt_secret: string = process.env["JWT_SECRET"]!;
+      let jwt_class = new JwtUtil();
+      let signparams = {
+        id: subscriber.id,
+        role: subscriber.role,
+        expires_in: "30min",
+        secret: jwt_secret,
+      };
+      let token = await jwt_class.sign(signparams);
       res.status(201).send({
         message: "User created successfully",
+        token: token,
       });
     } catch (e: any) {
       // This catch block is for unexpected errors, not validation errors
