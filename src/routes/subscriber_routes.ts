@@ -1,7 +1,14 @@
 import { Router } from "express";
 import { SubscriberAuth } from "../controllers/subcriber_controller.ts";
+import OauthUtils from "../controllers/oauth_controller.ts";
 const router: Router = Router();
 let sub_auth = new SubscriberAuth();
-router.post("/register", sub_auth.Register);
-router.post("/login", sub_auth.Login);
+let oauth_class = new OauthUtils();
+router.use((req, res, next) => {
+  console.log("HIT SUBSCRIBER ROUTER:", req.method, req.path);
+  next();
+});
+router.post("/register", (req, res) => sub_auth.Register(req, res));
+router.post("/login", (req, res) => sub_auth.Login(req, res));
+
 export default router;

@@ -6,8 +6,8 @@
     // Environment Settings
     "module": "nodenext",
     "target": "esnext",
-
-    // Other Outputs
+    "types": ["node"],
+      // Other Outputs
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
@@ -29,7 +29,6 @@
   },
   // ✅ exclude goes here, outside compilerOptions
   "exclude": [
-    "node_modules",
-    "prisma.config.ts"
+    "node_modules"
   ]
 }
