@@ -16,12 +16,13 @@ class OauthUtils {
       "https://www.googleapis.com/oauth2/v2/userinfo",
       {
         headers: { Authorization: `Bearer ${access_code}` },
-      }
+      },
     );
     const { email, name, id: google_id } = await userRes.json();
     return { email, name, google_id };
   }
   async redirect(res: Response) {
+    console.log("started redirect func ");
     //setting state cookie to prevent csrf attack forgery attack
     const state = crypto.randomUUID();
     // Set it as a cookie
@@ -30,7 +31,7 @@ class OauthUtils {
       maxAge: 5 * 60 * 1000, // 5 minutes is enough
       sameSite: "lax",
     });
-    redisClient.set(`oauth_state:${state}`, state, { EX: 3600 });
+    await redisClient.set(`oauth_state:${state}`, state, { EX: 3600 });
     const params = new URLSearchParams({
       client_id: process.env.GOOGLE_CLIENT_ID!,
       redirect_uri: process.env.GOOGLE_CALLBACK_URL!, // e.g. http://localhost:3000/auth/redirect
@@ -40,9 +41,7 @@ class OauthUtils {
       prompt: "consent",
       state,
     });
-    const google_url = `${
-      process.env.GOOGLE_REDIRECT_URL
-    }?${params.toString()}`;
+    const google_url = `${process.env.GOOGLE_AUTH_URL}?${params.toString()}`;
     console.log("Redirecting to:", google_url);
     res.redirect(302, google_url);
   }
@@ -52,7 +51,10 @@ class OauthUtils {
       const { state, code } = req.query as { state: string; code: string };
       console.log(state);
       const cookie_state = req.cookies.oauth_state;
-
+      if (!req.query.state || !req.query.iss) {
+        console.warn("Rejected malformed OAuth callback", req.query);
+        return res.status(400).send("Invalid OAuth callback");
+      }
       console.log(cookie_state);
       console.log(state);
       if (!state || state !== cookie_state) {
@@ -62,7 +64,7 @@ class OauthUtils {
         return;
       }
       const expected_state = await redisClient.get(
-        `oauth_state:${cookie_state}`
+        `oauth_state:${cookie_state}`,
       );
       if (state !== expected_state) {
         res.status(400).send({
@@ -84,7 +86,12 @@ class OauthUtils {
         }),
       });
       let { access_token } = await exchange.json();
-      res.redirect(`/auth/redirect?code=${access_token}`);
+      let redis_access = crypto.randomUUID();
+      await redisClient.set(`token:${redis_access}`, access_token, {
+        EX: 3600,
+      });
+      console.log(redis_access);
+      res.redirect(`/auth/finish-signup?code=${redis_access}`);
     } catch (e: unknown) {
       res.status(500).json({
         message: "Internal server error",
@@ -94,9 +101,12 @@ class OauthUtils {
   }
   async finish_signUp(req: Request, res: Response) {
     try {
-      let access_token = req.query.access_code as string;
-      let user_info = await this.get_user_data(access_token);
+      let access_token = req.query.code as string;
+      console.log(access_token);
+      let redis_access_token = await redisClient.get(`token:${access_token}`);
+      let user_info = await this.get_user_data(redis_access_token!);
       let { name, email } = user_info;
+      console.log(user_info);
       let create_user = await prisma.accounts.create({
         data: {
           name: name,
@@ -135,6 +145,7 @@ class OauthUtils {
     } catch (e) {
       res.status(400).send({
         message: "Internal server error",
+        error: e,
       });
     }
   }

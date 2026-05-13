@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { SubscriberAuth } from "../controllers/subcriber_controller.ts";
-import OauthUtils from "../controllers/oauth_controller.ts";
+import { SubscriberAuth } from "../controllers/subscriber.controller.ts";
+import OauthUtils from "../controllers/auth.controller.ts";
 const router: Router = Router();
 let sub_auth = new SubscriberAuth();
 let oauth_class = new OauthUtils();
