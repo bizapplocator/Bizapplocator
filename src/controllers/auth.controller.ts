@@ -112,7 +112,8 @@ class OauthUtils {
           name: name,
           email: email,
           password: null,
-          role: "user",
+          role: "USER",
+          signInMethod: "Google",
         },
       });
       let jwt_secret: string = process.env["JWT_SECRET"]!;

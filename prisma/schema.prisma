@@ -12,14 +12,108 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+enum Role {
+  ADMIN
+  USER
+  SUBSCRIBER
+}
+
+enum IdentificationType {
+  NATIONAL_ID
+  VOTERS_CARD
+  DRIVERS_LICENSE
+  INTERNATIONAL_PASSPORT
+}
+
+enum VerificationStatus {
+  APPROVED
+  PENDING
+  REJECTED
+}
 
 model Accounts {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String?
-  role      String
-  createdAt DateTime @default(now())
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String?
+  role         Role     @default(USER)   // ✅ now an enum with a safe default
+  createdAt    DateTime @default(now())
+  signInMethod String
+
+  // ✅ Link business auth to this account
+  businessOwnerAuth BusinessOwnerAuth?
+  // ✅ Link verifications done BY this admin account
+  verificationsHandled VerificationUpdate[]
 
   @@index([id, email])
+}
+
+model BusinessOwnerAuth {
+  id                         String             @id @default(cuid())
+  businessName               String
+  businessRegistrationNumber String?
+  ownerFullName              String
+  dateOfBirth                DateTime           @db.Date
+  nin                        String             @unique
+  phoneNumber                String
+  emailAddress               String             @unique
+  businessAddress            String
+  typeOfBusiness             String
+  meansOfIdentification      IdentificationType
+  identificationNumber       String
+  declarationConfirmed       Boolean
+  ownerSignature             String
+  signatureDate              DateTime
+  createdAt                  DateTime           @default(now())
+  updatedAt                  DateTime           @updatedAt
+
+  // ✅ Foreign key back to the subscriber account
+  account   Accounts @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String   @unique  // one account → one business profile
+
+  // ✅ Business documents/images
+  documents BusinessDocument[]
+
+  verification VerificationUpdate?
+
+  @@index([businessName])
+  @@index([phoneNumber])
+  @@index([meansOfIdentification])
+  @@index([createdAt])
+  @@map("business_owner_auths")
+}
+
+// ✅ New model to store uploaded verification images/docs
+model BusinessDocument {
+  id          String   @id @default(cuid())
+  url         String   // path or cloud storage URL (e.g. S3, Cloudinary)
+  fileType    String   // e.g. "image/jpeg", "application/pdf"
+  label       String?  // e.g. "CAC Certificate", "Owner ID Front"
+  uploadedAt  DateTime @default(now())
+
+  businessOwnerAuth   BusinessOwnerAuth @relation(fields: [businessOwnerAuthId], references: [id], onDelete: Cascade)
+  businessOwnerAuthId String
+
+  @@index([businessOwnerAuthId])
+  @@map("business_documents")
+}
+
+model VerificationUpdate {
+  id                 String             @id @default(cuid())
+  verificationStatus VerificationStatus @default(PENDING)
+  remarks            String?
+  dateVerified       DateTime?
+  createdAt          DateTime           @default(now())
+
+  // ✅ Admin who handled it (FK instead of loose string)
+  verifiedBy   Accounts? @relation(fields: [verifiedById], references: [id])
+  verifiedById String?
+
+  businessOwnerAuth   BusinessOwnerAuth @ relation(fields: [businessOwnerAuthId], references: [id], onDelete: Cascade)
+  businessOwnerAuthId String            @unique
+
+  @@index([verificationStatus])
+  @@index([verifiedById])
+  @@index([dateVerified])
+  @@map("verification_updates")
 }

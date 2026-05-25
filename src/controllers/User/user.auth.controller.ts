@@ -2,10 +2,10 @@ import type { Response, Request } from "express";
 import {
   register_schema,
   login_schema,
-} from "../schemas/subscribers.schema.ts";
-import { PasswordController } from "../utils/password_hashing.ts";
-import JwtUtil from "../utils/jwt_gen.ts";
-import { prisma } from "../lib/db.ts";
+} from "../../routes/schemas/subscribers.schema.ts";
+import { PasswordController } from "../../utils/password_hashing.ts";
+import JwtUtil from "../../utils/jwt_gen.ts";
+import { prisma } from "../../lib/db.ts";
 class SubscriberAuth {
   async Register(req: Request, res: Response): Promise<void> {
     try {
@@ -25,10 +25,10 @@ class SubscriberAuth {
       const pass_functions = new PasswordController();
       const { name, email, password } = user_info.data;
 
-      const subscribed = await prisma.accounts.findUnique({
+      const user_account = await prisma.accounts.findUnique({
         where: { email },
       });
-      if (subscribed) {
+      if (user_account) {
         res.status(200).send({
           message: "Login to continue",
         });
@@ -37,26 +37,27 @@ class SubscriberAuth {
       // Save to db
       const hash_password = await pass_functions.hashPassword(password);
       console.log("Started register route creating account");
-      const subscriber = await prisma.accounts.create({
+      const user = await prisma.accounts.create({
         data: {
           name: name,
           email: email,
           password: hash_password,
-          role: "subscriber",
+          role: "USER",
+          signInMethod: "LOCAL",
         },
       });
       let jwt_secret: string = process.env["JWT_SECRET"]!;
       let jwt_class = new JwtUtil();
       console.info("Started register route getting jwt");
       let signparams = {
-        id: subscriber.id,
-        role: subscriber.role,
+        id: user.id,
+        role: user.role,
         expires_in: "15m",
         secret: jwt_secret,
       };
       const refresh_params = {
-        id: subscriber.id,
-        role: subscriber.role,
+        id: user.id,
+        role: user.role,
         expires_in: "7d",
         secret: jwt_secret,
       };
@@ -96,16 +97,16 @@ class SubscriberAuth {
     try {
       // 2. Check the database for the subscriber
       // Note: In a real app, ensure you verify the hashed password (e.g., using bcrypt)
-      const subscriber = await prisma.accounts.findUnique({
+      const user = await prisma.accounts.findUnique({
         where: { email },
       });
-      console.log(subscriber?.password);
+      console.log(user?.password);
       let pass_controller = new PasswordController();
       let password_match = await pass_controller.verifyPassword(
         password,
-        subscriber?.password!
+        user?.password!,
       );
-      if (!subscriber || !password_match) {
+      if (!user || !password_match) {
         res.status(401).json({ message: "Invalid credentials " });
         return;
       }
@@ -115,15 +116,15 @@ class SubscriberAuth {
       const jwt_secret = process.env.JWT_SECRET || "your-default-secret";
 
       const access_params = {
-        id: subscriber.id,
-        role: subscriber.role,
+        id: user.id,
+        role: user.role,
         expires_in: "15m",
         secret: jwt_secret,
       };
 
       const refresh_params = {
-        id: subscriber.id,
-        role: subscriber.role,
+        id: user.id,
+        role: user.role,
         expires_in: "7d",
         secret: jwt_secret,
       };
