@@ -1,0 +1,715 @@
+<!--interface OtpEmailTemplatePayload {
+  email: string;
+  code: string;          // Expecting a 6-digit string like "482910"
+  companyDomain: string; // e.g., "BizSearch"
+}
+
+/**
+ * Generates an email-safe, high-compatibility HTML string for OTP delivery.
+ * Extracts the username fallback gracefully from the email string.
+ */
+export const generateOtpEmailTemplate = ({ email, code, companyDomain }: OtpEmailTemplatePayload): string => {
+  // Gracefully derive a temporary name from the email (e.g., "alex.smith@test.com" -> "Alex")
+  const derivedName = email.split('@')[0].split(/[._-]/)[0];
+  const formattedName = derivedName.charAt(0).toUpperCase() + derivedName.slice(1);
+
+  // Safeguard: Ensure the code splits into its 6 structural chunks safely
+  const digits = code.split('');
+  const d1 = digits[0] || '0';
+  const d2 = digits[1] || '0';
+  const d3 = digits[2] || '0';
+  const d4 = digits[3] || '0';
+  const d5 = digits[4] || '0';
+  const d6 = digits[5] || '0';
+
+  return -->
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>Reset Your Password</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=DM+Sans:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #0d0b1a;
+                font-family:
+                    "DM Sans",
+                    -apple-system,
+                    sans-serif;
+                -webkit-font-smoothing: antialiased;
+            }
+            a {
+                text-decoration: none;
+                color: #3bafef;
+            }
+            /* Mobile adjustments */
+            @media only screen and (max-width: 480px) {
+                .card-wrapper {
+                    padding: 24px 12px !important;
+                }
+                .content-body {
+                    padding-left: 20px !important;
+                    padding-right: 20px !important;
+                }
+                .digit-box {
+                    width: 38px !important;
+                    height: 50px !important;
+                    font-size: 22px !important;
+                }
+            }
+        </style>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #0d0b1a">
+        <table
+            width="100%"
+            border="0"
+            cellspacing="0"
+            cellpadding="0"
+            style="background-color: #0d0b1a; min-height: 100vh"
+        >
+            <tr>
+                <td
+                    align="center"
+                    valign="top"
+                    class="card-wrapper"
+                    style="padding: 48px 16px 64px"
+                >
+                    <table
+                        width="100%"
+                        border="0"
+                        cellspacing="0"
+                        cellpadding="0"
+                        style="
+                            max-width: 560px;
+                            background-color: #100e25;
+                            border-radius: 28px;
+                            overflow: hidden;
+                            border: 1px solid rgba(111, 79, 246, 0.25);
+                        "
+                    >
+                        <tr>
+                            <td
+                                align="center"
+                                style="
+                                    background-color: #12102a;
+                                    padding: 52px 40px 44px;
+                                    border-bottom: 1px solid
+                                        rgba(111, 79, 246, 0.15);
+                                "
+                            >
+                                <table
+                                    border="0"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    style="margin-bottom: 24px"
+                                >
+                                    <tr>
+                                        <td
+                                            align="center"
+                                            style="
+                                                width: 80px;
+                                                height: 80px;
+                                                background-color: #1e1a40;
+                                                border-radius: 20px;
+                                                border: 2px solid #6f4ff6;
+                                                vertical-align: middle;
+                                            "
+                                        >
+                                            <img
+                                                src="https://cdn-icons-png.flaticon.com/512/565/565547.png"
+                                                width="42"
+                                                height="42"
+                                                alt="Lock Icon"
+                                                style="
+                                                    display: block;
+                                                    margin: 0 auto;
+                                                "
+                                            />
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <h1
+                                    style="
+                                        font-family:
+                                            &quot;Sora&quot;, sans-serif;
+                                        font-size: 28px;
+                                        font-weight: 800;
+                                        color: #ffffff;
+                                        margin: 0 0 10px 0;
+                                        letter-spacing: -0.5px;
+                                    "
+                                >
+                                    Password Reset
+                                </h1>
+                                <p
+                                    style="
+                                        font-size: 15px;
+                                        font-weight: 300;
+                                        color: rgba(255, 255, 255, 0.55);
+                                        line-height: 1.6;
+                                        margin: 0;
+                                    "
+                                >
+                                    We received a request to reset your account
+                                    password.<br />Use the secure verification
+                                    code below to proceed.
+                                </p>
+
+                                <table
+                                    border="0"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    style="margin-top: 22px"
+                                >
+                                    <tr>
+                                        <td
+                                            style="
+                                                width: 60px;
+                                                height: 3px;
+                                                background: linear-gradient(
+                                                    90deg,
+                                                    #6f4ff6,
+                                                    #3bafef
+                                                );
+                                                border-radius: 2px;
+                                            "
+                                        ></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td
+                                class="content-body"
+                                style="
+                                    padding: 44px 40px 40px;
+                                    background-color: #100e25;
+                                "
+                            >
+                                <p
+                                    style="
+                                        font-size: 18px;
+                                        font-weight: 500;
+                                        color: #e8e2ff;
+                                        margin: 0 0 16px 0;
+                                    "
+                                >
+                                    Hello,
+                                    <span
+                                        style="color: #fabc2a; font-weight: 600"
+                                        >${formattedName}</span
+                                    >
+                                    👋
+                                </p>
+                                <p
+                                    style="
+                                        font-size: 15px;
+                                        color: rgba(220, 215, 255, 0.65);
+                                        line-height: 1.75;
+                                        margin: 0 0 32px 0;
+                                    "
+                                >
+                                    Someone requested a password reset for your
+                                    account. Enter the 6-digit verification code
+                                    below to continue. If you didn't make this
+                                    request, you can safely ignore this email —
+                                    your account remains completely secure.
+                                </p>
+
+                                <table
+                                    width="100%"
+                                    border="0"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    style="
+                                        background-color: #0d0b1e;
+                                        border: 1px solid
+                                            rgba(111, 79, 246, 0.3);
+                                        border-radius: 20px;
+                                        padding: 32px 24px 28px;
+                                        margin-bottom: 32px;
+                                        text-align: center;
+                                    "
+                                >
+                                    <tr>
+                                        <td
+                                            align="center"
+                                            style="
+                                                font-family:
+                                                    &quot;Sora&quot;, sans-serif;
+                                                font-size: 11px;
+                                                font-weight: 600;
+                                                letter-spacing: 2.5px;
+                                                color: rgba(111, 79, 246, 0.8);
+                                                text-transform: uppercase;
+                                                padding-bottom: 18px;
+                                            "
+                                        >
+                                            Your Verification Code
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center" valign="middle">
+                                            <table
+                                                border="0"
+                                                cellspacing="0"
+                                                cellpadding="0"
+                                                style="margin: 0 auto"
+                                            >
+                                                <tr>
+                                                    <td
+                                                        align="center"
+                                                        class="digit-box"
+                                                        style="
+                                                            width: 48px;
+                                                            height: 60px;
+                                                            background-color: #1c1840;
+                                                            border: 1.5px solid
+                                                                #c4b4ff;
+                                                            border-radius: 12px;
+                                                            font-family:
+                                                                &quot;Sora&quot;,
+                                                                sans-serif;
+                                                            font-size: 26px;
+                                                            font-weight: 800;
+                                                            color: #c4b4ff;
+                                                        "
+                                                    >
+                                                        ${d1}
+                                                    </td>
+                                                    <td width="6"></td>
+                                                    <td
+                                                        align="center"
+                                                        class="digit-box"
+                                                        style="
+                                                            width: 48px;
+                                                            height: 60px;
+                                                            background-color: #1c1840;
+                                                            border: 1.5px solid
+                                                                #a78bfa;
+                                                            border-radius: 12px;
+                                                            font-family:
+                                                                &quot;Sora&quot;,
+                                                                sans-serif;
+                                                            font-size: 26px;
+                                                            font-weight: 800;
+                                                            color: #a78bfa;
+                                                        "
+                                                    >
+                                                        ${d2}
+                                                    </td>
+                                                    <td width="6"></td>
+                                                    <td
+                                                        align="center"
+                                                        class="digit-box"
+                                                        style="
+                                                            width: 48px;
+                                                            height: 60px;
+                                                            background-color: #1c1840;
+                                                            border: 1.5px solid
+                                                                #ffffff;
+                                                            border-radius: 12px;
+                                                            font-family:
+                                                                &quot;Sora&quot;,
+                                                                sans-serif;
+                                                            font-size: 26px;
+                                                            font-weight: 800;
+                                                            color: #ffffff;
+                                                        "
+                                                    >
+                                                        ${d3}
+                                                    </td>
+
+                                                    <td
+                                                        width="14"
+                                                        align="center"
+                                                        style="
+                                                            font-size: 26px;
+                                                            font-weight: 800;
+                                                            color: rgba(
+                                                                111,
+                                                                79,
+                                                                246,
+                                                                0.5
+                                                            );
+                                                            font-family:
+                                                                &quot;Sora&quot;,
+                                                                sans-serif;
+                                                        "
+                                                    >
+                                                        &middot;
+                                                    </td>
+
+                                                    <td
+                                                        align="center"
+                                                        class="digit-box"
+                                                        style="
+                                                            width: 48px;
+                                                            height: 60px;
+                                                            background-color: #1c1840;
+                                                            border: 1.5px solid
+                                                                #3bafef;
+                                                            border-radius: 12px;
+                                                            font-family:
+                                                                &quot;Sora&quot;,
+                                                                sans-serif;
+                                                            font-size: 26px;
+                                                            font-weight: 800;
+                                                            color: #3bafef;
+                                                        "
+                                                    >
+                                                        ${d4}
+                                                    </td>
+                                                    <td width="6"></td>
+                                                    <td
+                                                        align="center"
+                                                        class="digit-box"
+                                                        style="
+                                                            width: 48px;
+                                                            height: 60px;
+                                                            background-color: #1c1840;
+                                                            border: 1.5px solid
+                                                                #7acfff;
+                                                            border-radius: 12px;
+                                                            font-family:
+                                                                &quot;Sora&quot;,
+                                                                sans-serif;
+                                                            font-size: 26px;
+                                                            font-weight: 800;
+                                                            color: #7acfff;
+                                                        "
+                                                    >
+                                                        ${d5}
+                                                    </td>
+                                                    <td width="6"></td>
+                                                    <td
+                                                        align="center"
+                                                        class="digit-box"
+                                                        style="
+                                                            width: 48px;
+                                                            height: 60px;
+                                                            background-color: #1c1840;
+                                                            border: 1.5px solid
+                                                                #fabc2a;
+                                                            border-radius: 12px;
+                                                            font-family:
+                                                                &quot;Sora&quot;,
+                                                                sans-serif;
+                                                            font-size: 26px;
+                                                            font-weight: 800;
+                                                            color: #fabc2a;
+                                                        "
+                                                    >
+                                                        ${d6}
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td
+                                            align="center"
+                                            style="
+                                                padding-top: 20px;
+                                                font-family:
+                                                    &quot;Sora&quot;, sans-serif;
+                                                font-size: 12px;
+                                                font-weight: 600;
+                                                color: rgba(
+                                                    255,
+                                                    255,
+                                                    255,
+                                                    0.35
+                                                );
+                                            "
+                                        >
+                                            Expires in
+                                            <span style="color: #fabc2a"
+                                                >15 minutes</span
+                                            >
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table
+                                    width="100%"
+                                    border="0"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                >
+                                    <tr>
+                                        <td
+                                            style="
+                                                height: 1px;
+                                                background: linear-gradient(
+                                                    90deg,
+                                                    transparent,
+                                                    rgba(111, 79, 246, 0.25) 30%,
+                                                    rgba(59, 175, 239, 0.2) 70%,
+                                                    transparent
+                                                );
+                                                margin: 32px 0;
+                                            "
+                                        ></td>
+                                    </tr>
+                                </table>
+
+                                <table
+                                    width="100%"
+                                    border="0"
+                                    cellspacing="0"
+                                    cellpadding="16"
+                                    style="
+                                        background-color: rgba(
+                                            250,
+                                            188,
+                                            42,
+                                            0.05
+                                        );
+                                        border: 1px solid
+                                            rgba(250, 188, 42, 0.18);
+                                        border-radius: 14px;
+                                        margin-bottom: 32px;
+                                    "
+                                >
+                                    <tr>
+                                        <td
+                                            style="
+                                                font-size: 13px;
+                                                color: rgba(255, 220, 100, 0.7);
+                                                line-height: 1.6;
+                                            "
+                                        >
+                                            <strong
+                                                style="
+                                                    color: #fabc2a;
+                                                    font-weight: 600;
+                                                "
+                                                >Security notice:</strong
+                                            >
+                                            We will never ask for your password,
+                                            credit card information, or identity
+                                            verification credentials via direct
+                                            link response channels. This code is
+                                            unique and expires quickly.
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table
+                                    width="100%"
+                                    border="0"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    style="margin-bottom: 16px"
+                                >
+                                    <tr>
+                                        <td
+                                            style="
+                                                font-family:
+                                                    &quot;Sora&quot;, sans-serif;
+                                                font-size: 11px;
+                                                font-weight: 700;
+                                                letter-spacing: 1.5px;
+                                                text-transform: uppercase;
+                                                color: rgba(255, 255, 255, 0.3);
+                                                padding-bottom: 16px;
+                                            "
+                                        >
+                                            How to verify
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-bottom: 12px">
+                                            <table
+                                                border="0"
+                                                cellspacing="0"
+                                                cellpadding="0"
+                                            >
+                                                <tr>
+                                                    <td
+                                                        valign="top"
+                                                        style="
+                                                            width: 24px;
+                                                            height: 24px;
+                                                            background-color: #6f4ff6;
+                                                            color: #ffffff;
+                                                            border-radius: 6px;
+                                                            font-family:
+                                                                &quot;Sora&quot;,
+                                                                sans-serif;
+                                                            font-size: 12px;
+                                                            font-weight: 800;
+                                                            text-align: center;
+                                                            line-height: 24px;
+                                                        "
+                                                    >
+                                                        1
+                                                    </td>
+                                                    <td width="14"></td>
+                                                    <td
+                                                        style="
+                                                            font-size: 14px;
+                                                            color: rgba(
+                                                                200,
+                                                                195,
+                                                                230,
+                                                                0.65
+                                                            );
+                                                            line-height: 1.5;
+                                                        "
+                                                    >
+                                                        <strong
+                                                            style="
+                                                                color: #ffffff;
+                                                            "
+                                                            >Enter the 6
+                                                            digits</strong
+                                                        >
+                                                        code provided above into
+                                                        your active screen
+                                                        session.
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-bottom: 12px">
+                                            <table
+                                                border="0"
+                                                cellspacing="0"
+                                                cellpadding="0"
+                                            >
+                                                <tr>
+                                                    <td
+                                                        valign="top"
+                                                        style="
+                                                            width: 24px;
+                                                            height: 24px;
+                                                            background-color: #3bafef;
+                                                            color: #ffffff;
+                                                            border-radius: 6px;
+                                                            font-family:
+                                                                &quot;Sora&quot;,
+                                                                sans-serif;
+                                                            font-size: 12px;
+                                                            font-weight: 800;
+                                                            text-align: center;
+                                                            line-height: 24px;
+                                                        "
+                                                    >
+                                                        2
+                                                    </td>
+                                                    <td width="14"></td>
+                                                    <td
+                                                        style="
+                                                            font-size: 14px;
+                                                            color: rgba(
+                                                                200,
+                                                                195,
+                                                                230,
+                                                                0.65
+                                                            );
+                                                            line-height: 1.5;
+                                                        "
+                                                    >
+                                                        <strong
+                                                            style="
+                                                                color: #ffffff;
+                                                            "
+                                                            >Create a strong new
+                                                            password</strong
+                                                        >
+                                                        with mixed attributes.
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td
+                                align="center"
+                                style="
+                                    background-color: #0c0a1f;
+                                    padding: 32px 40px 36px;
+                                    border-top: 1px solid
+                                        rgba(111, 79, 246, 0.12);
+                                "
+                            >
+                                <p
+                                    style="
+                                        font-family:
+                                            &quot;Sora&quot;, sans-serif;
+                                        font-size: 16px;
+                                        font-weight: 800;
+                                        color: rgba(255, 255, 255, 0.7);
+                                        margin: 0 0 14px 0;
+                                    "
+                                >
+                                    ${companyDomain}
+                                </p>
+
+                                <p
+                                    style="
+                                        font-size: 12px;
+                                        color: rgba(255, 255, 255, 0.2);
+                                        line-height: 1.7;
+                                        margin: 0;
+                                    "
+                                >
+                                    &copy; 2026 ${companyDomain} Inc. All Rights
+                                    Reserved.<br />
+                                    You are receiving this system validation
+                                    because an inquiry was requested for<br />
+                                    <a
+                                        href="mailto:${email}"
+                                        style="
+                                            color: rgba(59, 175, 239, 0.5);
+                                            text-decoration: none;
+                                        "
+                                        >${email}</a
+                                    >
+                                </p>
+                                <table
+                                    border="0"
+                                    cellspacing="0"
+                                    cellpadding="0"
+                                    style="margin-top: 20px"
+                                >
+                                    <tr>
+                                        <td
+                                            style="
+                                                width: 40px;
+                                                height: 2px;
+                                                background: linear-gradient(
+                                                    90deg,
+                                                    #6f4ff6,
+                                                    #fabc2a
+                                                );
+                                                border-radius: 1px;
+                                            "
+                                        ></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

@@ -1,0 +1,57 @@
+openapi: 3.0.0
+info:
+  title: BizSearch API
+  version: 1.0.0
+paths:
+  # --- Subscriber Routes (/subscriber) ---
+  /subscriber/register:
+    post:
+      summary: Register a new subscriber
+  /subscriber/login:
+    post:
+      summary: Login subscriber
+  /subscriber/find_user:
+    post:
+      summary: Find user for password reset
+  /subscriber/reset_password:
+    post:
+      summary: Change user password
+  /subscriber/test:
+    get:
+      summary: Test subscriber route
+
+  # --- Subscriber Data/Product Routes (/sub) ---
+  /sub/data:
+    get:
+      summary: Get user data
+  /sub/create-product:
+    post:
+      summary: Create a product
+  /sub/update-product:
+    patch:
+      summary: Update a product
+  /sub/delete-product:
+    delete:
+      summary: Delete a product
+  /sub/product/getAllProducts:
+    get:
+      summary: Get all products
+
+  # --- Auth/OAuth Routes (/auth) ---
+  /auth/oauth:
+    get:
+      summary: Redirect to OAuth provider
+  /auth/redirect:
+    get:
+      summary: Handle OAuth callback
+  /auth/finish-signup:
+    get:
+      summary: Finish signup process
+
+  # --- Admin Routes (/admin) ---
+  /admin/totalusers:
+    get:
+      summary: Get total user count
+  /admin/totalsub:
+    get:
+      summary: Get total subscriber count

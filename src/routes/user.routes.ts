@@ -1,14 +1,6 @@
 import { Router } from "express";
-import { SubscriberAuth } from "../controllers/User/user.auth.controller.ts";
-import OauthUtils from "../controllers/auth.controller.ts";
-const router: Router = Router();
-let sub_auth = new SubscriberAuth();
-let oauth_class = new OauthUtils();
-router.use((req, res, next) => {
-  console.log("HIT SUBSCRIBER ROUTER:", req.method, req.path);
-  next();
-});
-router.post("/register", (req, res) => sub_auth.Register(req, res));
-router.post("/login", (req, res) => sub_auth.Login(req, res));
+import Auth_middleware from "../middleware/auth.middleware.ts";
 
-export default router;
+const router = Router();
+const authBouncer = new Auth_middleware();
+router.use(authBouncer.authenticateUser);

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { type Response, type Request } from "express";
 
-import AdminControl from "../controllers/admin.controller.ts";
+import AdminControl from "../controllers/Admin/admin.controller.ts";
 import Auth_middleware from "../middleware/auth.middleware.ts";
 
 const route = Router();
@@ -14,7 +14,7 @@ route.get("/totalusers", (req: Request, res: Response) =>
 route.get("/totalsub", (req: Request, res: Response) =>
   adminClass.SubCount(req, res),
 );
-route.get("/view_reg_sub", (req: Request, res: Response) =>
-  adminClass.view_sub_details(req, res),
-);
+// route.get("/view_reg_sub", (req: Request, res: Response) =>
+//   adminClass.view_sub_details(req, res)
+// );
 export default route;

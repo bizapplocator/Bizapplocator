@@ -27,7 +27,7 @@ export const resetPasswordEmailHtml = (name: string, resetLink: string) => `
                 🔐 Password Reset
               </h1>
               <p style="margin:8px 0 0; color:#a0aec0; font-size:14px;">
-                Your App Name
+                BizAppLocator
               </p>
             </td>
           </tr>

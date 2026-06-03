@@ -31,5 +31,10 @@ class UserCont {
       return res.status(500).json({ message: "Internal server error" });
     }
   };
+  addProduct = (req: Request, res: Response) => {};
+  delProduct = () => (req: Request, res: Response) => {};
+  readProducts = (req: Request, res: Response) => {};
+  editProduct = (req: Request, res: Response) => {};
+  readAllProducts = (req: Request, res: Response) => {};
 }
 export default UserCont;

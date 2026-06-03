@@ -26,6 +26,30 @@ class Auth_middleware {
       res.status(401).send({ message: "Bad request" });
     }
   };
+  authenticateUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      let jwt_class = new JwtUtil();
+      const token = req.headers["authorization"]?.split(" ")[1];
+      if (!token) {
+        res.status(401).send({ message: "Bad request sent" });
+        return;
+      }
+      let user = jwt_class.decode(token) as TokenInfo;
+      if (user.role == "USER") {
+        req.user = user;
+        next();
+      }
+      res.status(403).send({ message: "Unauthorized access" });
+      return;
+    } catch (e) {
+      res.status(401).send({ message: "Bad request" });
+    }
+  };
+
   admin_auth = async (
     req: Request,
     res: Response,

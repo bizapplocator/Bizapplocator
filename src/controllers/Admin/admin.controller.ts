@@ -1,5 +1,5 @@
 import { type Response, type Request, json } from "express";
-import { prisma } from "../lib/db.ts";
+import { prisma } from "../../lib/db.ts";
 
 class AdminControl {
   async UserCount(req: Request, res: Response) {
@@ -23,9 +23,6 @@ class AdminControl {
     res.status(200).json({
       users: user_count,
     });
-  }
-  async subDetails(req: Request, res: Response) {
-    let subscriber = await prisma.accounts.findUnique();
   }
 }
 export default AdminControl;

@@ -39,11 +39,12 @@ model Accounts {
   role         Role     @default(USER)   // ✅ now an enum with a safe default
   createdAt    DateTime @default(now())
   signInMethod String
-
+  products  Product[]
   // ✅ Link business auth to this account
   businessOwnerAuth BusinessOwnerAuth?
   // ✅ Link verifications done BY this admin account
   verificationsHandled VerificationUpdate[]
+  otpVerifications     OtpVerification[]
 
   @@index([id, email])
 }
@@ -52,6 +53,7 @@ model BusinessOwnerAuth {
   id                         String             @id @default(cuid())
   businessName               String
   businessRegistrationNumber String?
+
   ownerFullName              String
   dateOfBirth                DateTime           @db.Date
   nin                        String             @unique
@@ -116,4 +118,52 @@ model VerificationUpdate {
   @@index([verifiedById])
   @@index([dateVerified])
   @@map("verification_updates")
+}
+model OtpVerification {
+  id        String   @id @default(uuid())
+  code      String   // Stores the 6-digit code (e.g., "482910")
+  expiresAt DateTime
+  used      Boolean  @default(false)
+
+  userId    String
+  user      Accounts @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("otp_verifications")
+}
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  basePrice   Decimal  @db.Decimal(12, 2)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Added: Relation to the User (Accounts model)
+  userId      String
+  user        Accounts @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Virtual relation to media
+  media       ProductMedia[]
+
+  // Indexes for performance
+  @@index([name])
+  @@index([userId]) // Added: Fast lookup for "my products"
+  @@map("products")
+}
+
+model ProductMedia {
+  id          String   @id @default(uuid())
+  url         String
+  altText     String?
+  rank        Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_media")
 }
