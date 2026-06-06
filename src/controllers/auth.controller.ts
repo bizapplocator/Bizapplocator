@@ -48,106 +48,123 @@ class OauthUtils {
 
   async handle_callback(req: Request, res: Response) {
     try {
-      const { state, code } = req.query as { state: string; code: string };
-      console.log(state);
+      const { state, code, error } = req.query as {
+        state?: string;
+        code?: string;
+        error?: string;
+      };
+
+      // 1. Intercept OAuth Errors from the Provider
+      if (error) {
+        return res
+          .status(400)
+          .json({ message: `OAuth Provider Error: ${error}` });
+      }
+
+      if (!state || !code) {
+        return res
+          .status(400)
+          .json({ message: "Missing state or code configuration parameters" });
+      }
+
+      // 2. Anti-CSRF Token Match Validation
       const cookie_state = req.cookies.oauth_state;
-      if (!req.query.state || !req.query.iss) {
-        console.warn("Rejected malformed OAuth callback", req.query);
-        return res.status(400).send("Invalid OAuth callback");
+      if (!cookie_state || state !== cookie_state) {
+        return res
+          .status(400)
+          .json({ message: "Invalid or expired state token" });
       }
-      console.log(cookie_state);
-      console.log(state);
-      if (!state || state !== cookie_state) {
-        res.status(400).send({
-          message: "Bad request",
-        });
-        return;
-      }
+
       const expected_state = await redisClient.get(
         `oauth_state:${cookie_state}`,
       );
-      if (state !== expected_state) {
-        res.status(400).send({
-          message: "Bad request to server",
-        });
-        return;
+      if (!expected_state || state !== expected_state) {
+        return res.status(400).json({ message: "State mismatch" });
       }
+
+      // Cleanup ephemeral states immediately
       await redisClient.del(`oauth_state:${cookie_state}`);
       res.clearCookie("oauth_state");
-      let exchange = await fetch("https://oauth2.googleapis.com/token", {
+
+      // 3. Spec-Compliant Token Exchange
+      const tokenParams = new URLSearchParams({
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID!,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+        redirect_uri: process.env.GOOGLE_CALLBACK_URL!,
+        grant_type: "authorization_code",
+      });
+
+      const exchange = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code,
-          client_id: process.env.GOOGLE_CLIENT_ID!,
-          client_secret: process.env.GOOGLE_CLIENT_SECRET!,
-          redirect_uri: process.env.GOOGLE_CALLBACK_URL!,
-          grant_type: "authorization_code",
-        }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: tokenParams.toString(),
       });
-      let { access_token } = await exchange.json();
-      let redis_access = crypto.randomUUID();
-      await redisClient.set(`token:${redis_access}`, access_token, {
-        EX: 3600,
-      });
-      console.log(redis_access);
-      res.redirect(`/auth/finish-signup?code=${redis_access}`);
-    } catch (e: unknown) {
-      res.status(500).json({
-        message: "Internal server error",
-      });
-      console.log("error this is the exchange code error");
-    }
-  }
-  async finish_signUp(req: Request, res: Response) {
-    try {
-      let access_token = req.query.code as string;
-      console.log(access_token);
-      let redis_access_token = await redisClient.get(`token:${access_token}`);
-      let user_info = await this.get_user_data(redis_access_token!);
-      let { name, email } = user_info;
-      console.log(user_info);
-      let create_user = await prisma.accounts.create({
-        data: {
-          name: name,
-          email: email,
-          password: null,
-          role: "USER",
-          signInMethod: "Google",
+
+      if (!exchange.ok) throw new Error("Failed token validation with Google");
+      const { access_token } = await exchange.json();
+
+      // 4. Fetch Core Identity Claims from Google Engine
+      const userRes = await fetch(
+        "https://www.googleapis.com/oauth2/v2/userinfo",
+        {
+          headers: { Authorization: `Bearer ${access_token}` },
         },
-      });
-      let jwt_secret: string = process.env["JWT_SECRET"]!;
-      let jwt_class = new JwtUtil();
-      console.info("Started register route getting jwt");
-      let signparams = {
-        id: create_user.id,
-        role: create_user.role,
-        expires_in: "15m",
-        secret: jwt_secret,
-      };
-      const refresh_params = {
-        id: create_user.id,
-        role: create_user.role,
+      );
+      if (!userRes.ok)
+        throw new Error("Failed to fetch user profiles from Google");
+      const { email, name } = await userRes.json();
+
+      // 5. Atomic Postgres Ingestion via Prisma (Find or Create)
+      // Use an upsert configuration or findUnique to ensure you don't break unique constraints if they sign in twice!
+      let user = await prisma.accounts.findUnique({ where: { email } });
+
+      if (!user) {
+        user = await prisma.accounts.create({
+          data: {
+            name,
+            email,
+            password: null,
+            role: "USER",
+            signInMethod: "Google",
+          },
+        });
+      }
+
+      // 6. Security Token Compilation & Cookies Setup
+      const jwt_class = new JwtUtil();
+      const jwt_secret = process.env.JWT_SECRET!;
+
+      const refreshToken = await jwt_class.sign({
+        id: user.id,
+        role: user.role,
         expires_in: "7d",
         secret: jwt_secret,
-      };
-      const refreshToken = await jwt_class.sign(refresh_params);
+      });
+
+      const accessToken = await jwt_class.sign({
+        id: user.id,
+        role: user.role,
+        expires_in: "15m",
+        secret: jwt_secret,
+      });
+
+      // Ship refresh token inside deep httpOnly cookies infrastructure
       res.cookie("refreshToken", refreshToken, {
-        httpOnly: true, // JS can't access it (XSS protection)
-        secure: true, // HTTPS only (set false in dev)
-        sameSite: "strict", // CSRF protection
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+        httpOnly: true,
+        secure: true, // Force HTTPS on production systems
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 Days
       });
-      let token = await jwt_class.sign(signparams);
-      res.status(201).send({
-        message: "User created successfully",
-        token: token,
+
+      // 7. Direct UI Redirect carrying access token payload safely
+      return res.status(201).json({
+        message: "Authentication lifecycle successful",
+        token: accessToken,
       });
-    } catch (e) {
-      res.status(400).send({
-        message: "Internal server error",
-        error: e,
-      });
+    } catch (e: any) {
+      console.error("Critical OAuth Handler Crash:", e.message);
+      return res.status(500).json({ message: "Internal server error" });
     }
   }
 }

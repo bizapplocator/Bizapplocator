@@ -2,7 +2,7 @@ import { Router } from "express";
 import type { Request, Response } from "express";
 import { SubscriberAuth } from "../controllers/User/user.auth.controller.ts";
 import OauthUtils from "../controllers/auth.controller.ts";
-import reset_password_class from "../controllers/User/reset_password.controller.ts";
+import { reset_password_class } from "../controllers/User/reset_password.controller.ts";
 const router: Router = Router();
 let sub_auth = new SubscriberAuth();
 let oauth_class = new OauthUtils();

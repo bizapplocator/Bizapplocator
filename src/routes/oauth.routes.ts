@@ -11,5 +11,4 @@ router.get("/oauth", (req, res) => {
   oauth_class.redirect(res);
 });
 router.get("/redirect", (req, res) => oauth_class.handle_callback(req, res));
-router.get("/finish-signup", (req, res) => oauth_class.finish_signUp(req, res));
 export default router;

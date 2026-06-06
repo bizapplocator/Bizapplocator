@@ -55,7 +55,7 @@ import type { EmailPayload } from "../../services/emailFactory.services.ts";
 import { generatePasswordResetEmail } from "../../templates/reset.templates.ts";
 import type { GenResetEmailParams } from "../../templates/reset.templates.ts";
 
-class reset_password_class {
+export class reset_password_class {
   reset_password = async (req: Request, res: Response) => {
     let user_details = reset_req.safeParse(req.body);
     if (user_details.error) {
@@ -104,7 +104,7 @@ class reset_password_class {
           password,
           code.code,
         );
-        const db_cleanup =
+        const db_cleanup = this;
         if (change_pass) {
           res.status(200).send({
             message: "Password change successfull",
@@ -173,6 +173,7 @@ class reset_password_class {
       if (!otp_verification.success) {
         throw new Error("Bad otp code");
       }
+      const db_cleanup = await this.db_cleanup(id);
 
       let change_user_password: UserInfo = await prisma.accounts.update({
         where: {
@@ -283,21 +284,18 @@ class reset_password_class {
         where: {
           userId: userId,
           OR: [
-            { used: true },                     // Already used
-            { expiresAt: { lt: new Date() } }   // Expired
+            { used: true }, // Already used
+            { expiresAt: { lt: new Date() } }, // Expired
           ],
         },
       });
 
       return deletedCount;
-
     } catch (e) {
-      console.log("Db cleanup error" , e)
-      throw new Error("Db cleanup not done yet")
+      console.log("Db cleanup error", e);
+      throw new Error("Db cleanup not done yet");
 
-    // This removes all expired OR already used OTPs for a specific user
-
+      // This removes all expired OR already used OTPs for a specific user
+    }
   };
 }
-
-export default reset_password_class;
