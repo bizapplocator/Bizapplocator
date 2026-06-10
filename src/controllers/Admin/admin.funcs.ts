@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/db.ts";
 import type { Response, Request } from "express";
 
-class AdminFuncs {
+export class AdminFuncs {
   // Add this to your AdminControl class
   getPendingVerifications = async (req: Request, res: Response) => {
     try {

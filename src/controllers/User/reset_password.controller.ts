@@ -44,7 +44,7 @@ import {
   reset_req,
   change_password_schema,
   otpSchema,
-} from "../../routes/schemas/request_data.schema.ts";
+} from "../../schemas/request_data.schema.ts";
 import crypto from "crypto";
 import type { Request, Response } from "express";
 import { prisma } from "../../lib/db.ts";

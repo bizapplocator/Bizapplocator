@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
 import { prisma } from "../lib/db.ts";
-import { businessOwnerAuthSchema } from "../routes/schemas/bizVerification.schema.ts";
+import { businessOwnerAuthSchema } from "../schemas/bizVerification.schema.ts";
 import {
   createProductSchema,
   updateProductSchema,
-} from "../routes/schemas/request_data.schema.ts";
+} from "../schemas/request_data.schema.ts";
 class subController {
   register_sub = async (req: Request, res: Response) => {
     try {

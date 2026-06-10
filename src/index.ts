@@ -3,7 +3,7 @@ import express from "express";
 
 import cookieParser from "cookie-parser";
 import user_route from "./routes/public.route.ts";
-import auth_route from "./lib/oauth.routes.ts";
+import auth_route from "./routes/oauth.routes.ts";
 import sub_route from "./routes/subscriber.route.ts";
 import admin_route from "./routes/admin.routes.ts";
 import { connectRedis } from "./redis.ts";
@@ -46,3 +46,4 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is live at http://localhost:${PORT}`);
 });
+export default app;

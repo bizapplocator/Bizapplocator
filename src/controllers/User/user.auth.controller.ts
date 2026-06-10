@@ -2,7 +2,7 @@ import type { Response, Request } from "express";
 import {
   register_schema,
   login_schema,
-} from "../../routes/schemas/request_data.schema.ts";
+} from "../../schemas/request_data.schema.ts";
 import { PasswordController } from "../../utils/password_hashing.ts";
 import JwtUtil from "../../utils/jwt_gen.ts";
 import { prisma } from "../../lib/db.ts";
