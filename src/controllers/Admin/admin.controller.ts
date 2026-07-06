@@ -1,0 +1,29 @@
+import { type Response, type Request, json } from "express";
+import { prisma } from "../../lib/db.ts";
+import { AdminFuncs } from "./admin.funcs.ts";
+
+class AdminControl extends AdminFuncs {
+  async UserCount(req: Request, res: Response) {
+    let user_count = await prisma.accounts.count({
+      where: {
+        role: {
+          in: ["SUBSCRIBER", "USER"],
+        },
+      },
+    });
+    res.status(200).json({
+      users: user_count,
+    });
+  }
+  async SubCount(req: Request, res: Response) {
+    let user_count = await prisma.accounts.count({
+      where: {
+        role: "SUBSCRIBER",
+      },
+    });
+    res.status(200).json({
+      users: user_count,
+    });
+  }
+}
+export default AdminControl;
