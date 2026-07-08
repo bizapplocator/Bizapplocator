@@ -56,10 +56,14 @@ const change_password_schema = z.object({
   password: passwordSchema,
   code: otpSchema,
 });
+const create_chat_schema = z.object({
+  biz_email: z.email(),
+});
 export {
   register_schema,
   login_schema,
   reset_req,
+  create_chat_schema,
   change_password_schema,
   otpSchema,
   updateProductSchema,

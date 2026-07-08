@@ -167,3 +167,34 @@ model ProductMedia {
   @@index([productId])
   @@map("product_media")
 }
+model ChatRoom {
+  id        String    @id @default(cuid())
+  name      String?   // Optional: Name for the chat
+  messages  Message[] // Relation: All messages in this room
+
+  userId      String    // The User who initiated the chat
+  businessId  String    // The Business the user is chatting with
+  createdAt DateTime  @default(now())
+  @@unique([userId, businessId])
+}
+
+// Every message points to the room it belongs to
+model Message {
+  id        String   @id @default(cuid())
+  content   String?
+  roomId    String
+  room      ChatRoom @relation(fields: [roomId], references: [id])
+  image     Image?   // Optional: A message can have one image
+  createdAt DateTime @default(now())
+}
+
+// Dedicated model for images, as requested
+model Image {
+  id        String   @id @default(cuid())
+  url       String
+  altText   String?  // Metadata
+  width     Int?     // Metadata
+  height    Int?     // Metadata
+  messageId String?  @unique // Links back to a specific message
+  message   Message? @relation(fields: [messageId], references: [id])
+}
